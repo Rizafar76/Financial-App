@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, FlatList, SafeAreaView } from 'react-native';
-import { useRouter } from 'expo-router';
-import { MetalCard } from '@/src/components/MetalCard';
-import { MetalData } from '@/src/navigation/types';
-import { styles } from '@/src/styles/HomeScreen.styles';
+import { useNavigation } from '@react-navigation/native';
+import { HomeScreenNavigationProp, MetalData } from '../navigation/types';
+import { MetalCard } from '../components/MetalCard';
+import { styles } from '../styles/HomeScreen.styles';
 
 /**
  * Mock data for the metal price tracking app
+ * In a real app, this would be fetched from an API
  */
 const METAL_DATA: MetalData[] = [
   {
@@ -47,15 +48,16 @@ const METAL_DATA: MetalData[] = [
   },
 ];
 
-export default function HomeScreen() {
-  const router = useRouter();
+/**
+ * HomeScreen component
+ * Displays a list of metals with their current prices and navigation to details
+ */
+export const HomeScreen: React.FC = () => {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
+  // Function to handle navigation with params
   const handlePress = (metal: MetalData) => {
-    // Navigate using Expo Router with params
-    router.push({
-      pathname: '/details',
-      params: { metal: JSON.stringify(metal) }
-    });
+    navigation.navigate('Details', { metal });
   };
 
   return (
@@ -79,5 +81,5 @@ export default function HomeScreen() {
       />
     </SafeAreaView>
   );
-}
+};
 
