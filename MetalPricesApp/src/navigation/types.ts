@@ -12,6 +12,11 @@ export interface MetalData {
   change: number;
   description: string;
   color: string;
+  open?: number;
+  close?: number;
+  high?: number;
+  low?: number;
+  timestamp?: string;
 }
 
 /**
@@ -20,7 +25,7 @@ export interface MetalData {
  */
 export type RootStackParamList = {
   Home: undefined; // Home screen doesn't take any params
-  Details: { metal: MetalData }; // Details screen requires metal data
+  details: { metal: MetalData }; // details screen requires metal data
 };
 
 /**
@@ -34,4 +39,4 @@ export type HomeScreenNavigationProp = NativeStackNavigationProp<
 /**
  * Helper type for route prop in Details Screen
  */
-export type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'Details'>;
+export type DetailsScreenRouteProp = RouteProp<RootStackParamList, 'details'>;

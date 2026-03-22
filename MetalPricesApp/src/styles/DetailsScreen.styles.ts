@@ -1,107 +1,162 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform, useWindowDimensions } from 'react-native';
+import { Colors, Spacing, Typography, BorderRadius, GlobalStyles, MAX_CONTENT_WIDTH } from './GlobalStyles';
 
-/**
- * Styles for the DetailsScreen
- */
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  hero: {
-    padding: 32,
-    alignItems: 'center',
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    marginTop: 40, // Space for transparent header
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  symbolLarge: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  price: {
-    fontSize: 40,
-    fontWeight: '800',
-    color: '#1A1A1A',
-    marginVertical: 8,
-  },
-  changeBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginTop: 8,
-  },
-  changeText: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  infoSection: {
-    padding: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#666666',
-    marginBottom: 24,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 16,
-  },
-  statBox: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-    padding: 16,
-    borderRadius: 16,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#999999',
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  buyButton: {
-    backgroundColor: '#1A1A1A',
-    margin: 24,
-    padding: 18,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  buyButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-});
+export const getStyles = (colorScheme: 'light' | 'dark', width: number) => {
+  const theme = Colors[colorScheme];
+  const isTablet = width > 600;
+  
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    header: {}, // Failsafe for legacy access
+    scrollContent: {
+      paddingBottom: Spacing.xxl,
+    },
+    hero: {
+      paddingTop: Spacing.xxl * 1.5,
+      paddingBottom: Spacing.m,
+      alignItems: 'center',
+      borderBottomLeftRadius: BorderRadius.xl,
+      borderBottomRightRadius: BorderRadius.xl,
+    },
+    iconContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: BorderRadius.l,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: Spacing.s,
+      ...GlobalStyles.cardShadow,
+    },
+    symbolLarge: {
+      ...Typography.header1,
+      color: theme.surface,
+      fontSize: 28,
+    },
+    name: {
+      ...Typography.header2,
+      color: theme.text,
+      marginTop: Spacing.s,
+    },
+    price: {
+      ...Typography.header1,
+      fontSize: 48,
+      color: theme.text,
+      marginTop: Spacing.m, // Increased space from name
+      marginBottom: Spacing.xs,
+    },
+    changeBadge: {
+      paddingHorizontal: Spacing.m,
+      paddingVertical: Spacing.xs,
+      borderRadius: BorderRadius.full,
+      marginTop: Spacing.s,
+    },
+    changeText: {
+      ...Typography.caption,
+      fontWeight: '800',
+    },
+    infoSection: {
+      padding: Spacing.l,
+      ...(isTablet ? {
+        alignSelf: 'center',
+        maxWidth: 800,
+        width: '100%',
+      } : {}),
+    },
+    sectionTitle: {
+      ...Typography.header2,
+      color: theme.text,
+      marginBottom: Spacing.s,
+    },
+    description: {
+      ...Typography.body,
+      color: theme.textMuted,
+      lineHeight: 24,
+      marginBottom: Spacing.l,
+    },
+    statsGrid: {
+      flexDirection: 'column',
+      gap: Spacing.m,
+      marginBottom: Spacing.xl,
+    },
+    statRow: {
+      flexDirection: 'row',
+      gap: Spacing.m,
+    },
+    statBox: {
+      flex: 1,
+      flexGrow: 1,
+      minWidth: isTablet ? 180 : (width - Spacing.l * 2 - Spacing.m) / 2, // Perfect 2-column grid
+      backgroundColor: theme.surface,
+      padding: Spacing.m,
+      borderRadius: BorderRadius.m,
+      borderWidth: 1,
+      borderColor: theme.border,
+      ...GlobalStyles.cardShadow,
+    },
+    statLabel: {
+      ...Typography.caption,
+      color: theme.textMuted,
+      textTransform: 'uppercase',
+      letterSpacing: 1,
+      marginBottom: 4,
+    },
+    statValue: {
+      ...Typography.subtitle,
+      color: theme.text,
+      fontSize: 18,
+    },
+    actionContainer: {
+      padding: Spacing.l,
+      ...(isTablet ? {
+        alignSelf: 'center',
+        maxWidth: 400,
+        width: '100%',
+      } : {}),
+    },
+    backButton: {
+      position: 'absolute',
+      zIndex: 10,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.glass,
+      ...GlobalStyles.cardShadow,
+    },
+    backgroundContainer: {
+      ...StyleSheet.absoluteFillObject,
+      zIndex: -1,
+      opacity: 0.15,
+    },
+    alertBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: theme.success + '20',
+      paddingHorizontal: Spacing.m,
+      paddingVertical: 6,
+      borderRadius: BorderRadius.full,
+      marginTop: Spacing.m,
+      borderWidth: 1,
+      borderColor: theme.success + '40',
+    },
+    alertBadgeText: {
+      ...Typography.caption,
+      color: theme.success,
+      fontWeight: '800',
+      marginLeft: 6,
+    },
+    alertButton: {
+      borderColor: theme.success,
+      backgroundColor: theme.success + '05',
+      marginTop: Spacing.m,
+    },
+    alertButtonText: {
+      color: theme.success,
+      fontWeight: '700',
+    }
+  });
+};

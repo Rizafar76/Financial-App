@@ -48,10 +48,10 @@ const AppNavigator: React.FC = () => {
 
         {/* Details Screen */}
         <Stack.Screen 
-          name="Details" 
+          name="details" 
           component={DetailsScreen} 
           options={({ route }) => ({ 
-            title: `${route.params.metal.name} Details`,
+            title: `${route.params?.metal?.name || 'Metal'} Details`,
             headerTransparent: true, // Seamless look with hero section
             headerTitle: '', // Hide title if we want a cleaner look, or keep it
           })} 

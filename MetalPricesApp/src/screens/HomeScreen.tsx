@@ -1,85 +1,113 @@
 import React from 'react';
-import { View, Text, FlatList, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, useWindowDimensions, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HomeScreenNavigationProp, MetalData } from '../navigation/types';
 import { MetalCard } from '../components/MetalCard';
-import { styles } from '../styles/HomeScreen.styles';
+import { MetalCardSkeleton } from '../components/MetalCardSkeleton';
+import { AppHeader } from '../components/AppHeader';
+import { getStyles } from '../styles/HomeScreen.styles';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useMetalPrice } from '../hooks/useMetalPrice';
 
 /**
- * Mock data for the metal price tracking app
- * In a real app, this would be fetched from an API
+ * Metal Card Wrapper
+ * Handles independent fetching and loading logic for each metal
  */
-const METAL_DATA: MetalData[] = [
-  {
-    id: '1',
-    name: 'Gold',
-    symbol: 'XAU',
-    price: 2150.45,
-    change: 1.25,
-    description: 'Gold is a precious metal that has been used for coinage, jewelry, and other arts throughout recorded history.',
-    color: '#FFD700',
-  },
-  {
-    id: '2',
-    name: 'Silver',
-    symbol: 'XAG',
-    price: 24.85,
-    change: -0.45,
-    description: 'Silver is a chemical element with the symbol Ag and atomic number 47. A soft, white, lustrous transition metal.',
-    color: '#C0C0C0',
-  },
-  {
-    id: '3',
-    name: 'Platinum',
-    symbol: 'XPT',
-    price: 915.20,
-    change: 0.15,
-    description: 'Platinum is a chemical element with the symbol Pt and atomic number 78. It is a dense, malleable, ductile, highly unreactive, precious, silver-white transition metal.',
-    color: '#E5E4E2',
-  },
-  {
-    id: '4',
-    name: 'Palladium',
-    symbol: 'XPD',
-    price: 1050.75,
-    change: -1.10,
-    description: 'Palladium is a chemical element with the symbol Pd and atomic number 46. It is a rare and lustrous silvery-white metal.',
-    color: '#444444',
-  },
+const ConnectedMetalCard: React.FC<{ id: string; name: string; symbol: string; color: string; onPress: (metal: MetalData) => void }> = ({ id, name, symbol, color, onPress }) => {
+  const { data, loading, error, refresh } = useMetalPrice(id);
+
+  if (loading && !data) {
+    return <MetalCardSkeleton />;
+  }
+
+  // If error, we still show the card but with error indicators (optional)
+  // For now, we'll just show the last known data or a fallback
+  const displayData: MetalData = data || {
+    id,
+    name,
+    symbol,
+    price: 0,
+    change: 0,
+    description: '',
+    color,
+  };
+
+  return (
+    <MetalCard 
+      metal={displayData} 
+      onPress={() => !loading && onPress(displayData)} 
+      error={error ? 'Failed to fetch balance data' : undefined}
+    />
+  );
+};
+
+// Metadata for metals to initiate fetching
+const METAL_METADATA = [
+  { id: '1', name: 'Gold', symbol: 'XAU', color: '#D4AF37' },
+  { id: '2', name: 'Silver', symbol: 'XAG', color: '#C0C0C0' },
+  { id: '3', name: 'Platinum', symbol: 'XPT', color: '#E5E4E2' },
+  { id: '4', name: 'Palladium', symbol: 'XPD', color: '#8E8E93' },
 ];
 
 /**
  * HomeScreen component
- * Displays a list of metals with their current prices and navigation to details
+ * Real-time data integration with independent card loading
  */
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme() ?? 'light';
+  const { width } = useWindowDimensions();
+  const styles = getStyles(colorScheme, width) || {};
 
-  // Function to handle navigation with params
+  const isTablet = width > 600;
+  const isLaptop = width > 1024;
+  const numColumns = 2;
+
   const handlePress = (metal: MetalData) => {
-    navigation.navigate('Details', { metal });
+    navigation.navigate('details', { metal });
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Market Overview</Text>
-        <Text style={styles.subtitle}>Real-time metal price tracking</Text>
+  const renderHeader = () => (
+    <View style={{ paddingLeft: insets.left, paddingRight: insets.right, marginBottom: 16 }}>
+      <View style={styles.heroCard}>
+        <Text style={styles.heroTitle}>PORTFOLIO ESTIMATE (XAU)</Text>
+        <Text style={styles.heroValue}>$12,450.80</Text>
       </View>
+      <Text style={styles.sectionTitle}>Live Markets</Text>
+    </View>
+  );
 
+  return (
+    <View style={styles.container}>
+      <AppHeader />
+      
       <FlatList
-        data={METAL_DATA}
+        data={METAL_METADATA}
         keyExtractor={(item) => item.id}
+        numColumns={numColumns}
+        key={`columns-${numColumns}`} 
         renderItem={({ item }) => (
-          <MetalCard
-            metal={item}
-            onPress={() => handlePress(item)}
+          <ConnectedMetalCard
+            id={item.id}
+            name={item.name}
+            symbol={item.symbol}
+            color={item.color}
+            onPress={handlePress}
           />
         )}
-        contentContainerStyle={styles.listContainer}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={[
+          styles.listContent,
+          { 
+            paddingLeft: insets.left,
+            paddingRight: insets.right,
+          }
+        ]}
+        columnWrapperStyle={styles.columnWrapper}
         showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+    </View>
   );
 };
-

@@ -8,22 +8,27 @@ import { View, Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 export default function ExploreScreen() {
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Market Analysis</Text>
-        <Text style={styles.subtitle}>Insights and trends for precious metals</Text>
-        
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Global Trends</Text>
-          <Text style={styles.cardText}>
-            Gold prices are showing steady growth due to market fluctuations. Silver remains a strong diversification asset.
-          </Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Expert Predictions</Text>
-          <Text style={styles.cardText}>
-            Analysts predict a bullish run for Platinum in the coming quarter.
-          </Text>
+      <ScrollView 
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.maxWidthWrapper}>
+          <Text style={styles.title}>Market Analysis</Text>
+          <Text style={styles.subtitle}>Insights and trends for precious metals</Text>
+          
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Global Trends</Text>
+            <Text style={styles.cardText}>
+              Gold prices are showing steady growth due to market fluctuations. Silver remains a strong diversification asset.
+            </Text>
+          </View>
+  
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Expert Predictions</Text>
+            <Text style={styles.cardText}>
+              Analysts predict a bullish run for Platinum in the coming quarter.
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -33,15 +38,21 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F7F8FA',
   },
   content: {
     padding: 24,
+    paddingTop: 48,
+    alignItems: 'center',
+  },
+  maxWidthWrapper: {
+    maxWidth: 800,
+    width: '100%',
   },
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#1A1A1A',
+    color: '#121212',
   },
   subtitle: {
     fontSize: 16,
@@ -54,10 +65,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)',
     elevation: 3,
   },
   cardTitle: {
